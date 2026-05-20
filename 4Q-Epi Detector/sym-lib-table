@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "LT5400")(type "KiCad")(uri "${KIPRJMOD}/library/LT5400.kicad_sym")(options "")(descr ""))
+  (lib (name "S11142-10")(type "KiCad")(uri "${KIPRJMOD}/library/S11142-10.kicad_sym")(options "")(descr ""))
+  (lib (name "S11142-10_clamp")(type "KiCad")(uri "${KIPRJMOD}/library/S11142-10_clamp.kicad_sym")(options "")(descr ""))
+)
