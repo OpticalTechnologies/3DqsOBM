@@ -64,7 +64,7 @@ figure;
 orthosliceViewer(SHG);
 colormap gray
 %% Optional rescaling for up/downsampling 
-% to resize the lateral frequency space. Ths is needed if you subsample 
+% Used to resize the lateral frequency space. This is needed if you subsample 
 % your image, i.e, your resolution is below the resolution of your MOs NA.
 % If this happens, the image frequency space would be smaller than the
 % pupil function of your MO and will lead to errors in the following
@@ -93,7 +93,7 @@ colormap gray
 % Microscope and image parameters:
 lambda = 1.050; % Wavelength in µm
 NA = 0.8; % NA of microscope objective
-FOVx = 276.93*0.9; % Field of view in µm. Square images are assumed!
+FOVx = 276.93; % Field of view in the aquired images in µm. Square images are assumed!
 FOVx = FOVx * ROI_cutout/ogImsize; % Correct for the ROI cutout, if used
 FOVz = Zstack_size; % Axial field of view in µm
 pxN = imSize; % Lateral pixel number
@@ -153,9 +153,9 @@ daspect([1 1 1])
 colormap jet
 colorbar
 %% Calculate T2D and T3D
-% Calculating the optical transferfunction this is the most time consuming step. 
-% The gridRes is the grid resolution at which the delta function in the T3D
-% integral is evaluated in sperical coordinates. 512 sufficiently precise
+% Calculating the optical transferfunction. This is the most time consuming step. 
+% gridRes is the grid resolution at which the delta function in the T3D
+% integral is evaluated in sperical coordinates. 512 is sufficiently precise
 % and fast. 
 gridRes = 512;
 OTF = calc2D3DOTF(lambda,NA,FOVx,FOVz,pxN,pzN,gridRes,P,DPLD);
@@ -168,7 +168,6 @@ T3D = OTF.T3D;
 save('OTF_justCalced.mat', 'T2D', 'T3D')
 
 img = T2D;
-
 figure;
 hIm=imagesc(zeros(size(img)));
 set(gca,'XTick',[], 'YTick',[], 'Position',[0,0,1,1]) %Fill the window with the image
@@ -203,14 +202,15 @@ for slice = 1:Zstack_nr
    
    % Remove some specific noise bands
    % Carefully inspect the image fft.
-   % These following ones should be 0 anyway as phase gradient images have
-   % no DC component. 
+   % These following frequency components (for 900x900px) should be 0 
+   % anyway as phase gradient images have no DC component. 
    F_PGX_(:,451) = 0; 
    F_PGY_(:,451) = 0;
    F_PGX_(451,:) = 0;
    F_PGY_(451,:) = 0;
    %F_SHG_(451,:) = 0;
    %F_SHG_(451,:) = 0;
+   % Specific noise bands that were notable in our setup
    %F_PGX_(:,657) = 0;
    %F_PGY_(:,657) = 0;
    %F_PGX_(:,245) = 0;
@@ -224,6 +224,8 @@ clear('PGX_','PGY_','SHG_','F_PGX_','F_PGY_','F_SHG_');
 
 %% Reconstruct Z-Stack with T3D
 alpha =5.15e-6; % Regularization parameter for direct deconvolution
+% Either tune alpha with a known sample to match to the expected 
+% index values or use an automatic optimization algorithm
 
 % n0 is the background or mean refractive index across your focal plane,
 % not necessarily your scattering medium!
